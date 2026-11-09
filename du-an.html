@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dự án bất động sản — Tổ Ấm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="projects">
+  <div id="header"></div>
+
+  <main class="container page">
+    <nav class="crumbs"><a href="index.html">Trang chủ</a> / Dự án</nav>
+    <div class="section__head section__head--tight">
+      <div>
+        <h1 class="page-title">Dự án bất động sản</h1>
+        <p class="muted" id="projectMeta"></p>
+      </div>
+    </div>
+
+    <form class="filter-bar" id="projectFilter" autocomplete="off">
+      <select id="pCity" class="field"></select>
+      <select id="pStatus" class="field">
+        <option value="">Tất cả trạng thái</option>
+        <option>Đang mở bán</option>
+        <option>Sắp mở bán</option>
+        <option>Đã bàn giao</option>
+      </select>
+      <div class="search__kw">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="pKeyword" type="text" placeholder="Tên dự án, khu vực..." />
+      </div>
+      <button class="btn btn--primary btn--lg" type="submit">Tìm dự án</button>
+    </form>
+
+    <div class="projects" id="projectGrid"></div>
+  </main>
+
+  <div id="footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

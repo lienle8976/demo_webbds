@@ -1,0 +1,10 @@
+# Cài đặt Claude Code cá nhân (không chia sẻ)
+.claude/settings.local.json
+
+# Hệ điều hành / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Phụ thuộc (nếu sau này dùng npm)
+node_modules/

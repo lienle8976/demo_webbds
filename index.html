@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tổ Ấm — Kênh mua bán, cho thuê nhà đất</title>
+  <meta name="description" content="Tìm kiếm nhà đất bán, cho thuê, dự án bất động sản trên toàn quốc." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="home">
+  <div id="header"></div>
+
+  <!-- ============ HERO + TÌM KIẾM ============ -->
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="container hero__content">
+      <h1>Tìm nơi bạn gọi là <span>nhà</span></h1>
+      <p class="hero__sub">Hàng nghìn tin rao nhà đất bán, cho thuê và dự án mới được cập nhật mỗi ngày.</p>
+
+      <form class="search" id="searchForm" autocomplete="off">
+        <div class="search__tabs" role="tablist">
+          <button type="button" class="search__tab is-active" data-mode="ban">Nhà đất bán</button>
+          <button type="button" class="search__tab" data-mode="thue">Nhà đất cho thuê</button>
+          <button type="button" class="search__tab" data-mode="projects">Dự án</button>
+        </div>
+        <div class="search__box">
+          <div class="search__row">
+            <select id="sCity" class="field field--city"></select>
+            <div class="search__kw">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="sKeyword" type="text" placeholder="Nhập địa điểm, tên dự án, đường phố..." />
+            </div>
+            <button type="submit" class="btn btn--primary btn--lg">Tìm kiếm</button>
+          </div>
+          <div class="search__row search__row--filters">
+            <select id="sType" class="field"></select>
+            <select id="sPrice" class="field"></select>
+            <select id="sArea" class="field"></select>
+            <select id="sBeds" class="field">
+              <option value="">Số phòng ngủ</option>
+              <option value="1">1+ phòng</option>
+              <option value="2">2+ phòng</option>
+              <option value="3">3+ phòng</option>
+              <option value="4">4+ phòng</option>
+            </select>
+            <button type="button" class="link-btn" id="resetBtn">Đặt lại</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="hero__stats">
+        <div><strong id="statListings">0</strong><span>tin đang rao</span></div>
+        <div><strong>63</strong><span>tỉnh thành</span></div>
+        <div><strong id="statProjects">0</strong><span>dự án nổi bật</span></div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <!-- ============ TIN BÁN NỔI BẬT ============ -->
+    <section class="section">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2>Bất động sản bán nổi bật</h2>
+            <p class="muted">Tin VIP và tin mới nhất trên toàn quốc</p>
+          </div>
+          <a href="tim-kiem.html?mode=ban" class="see-all">Xem tất cả →</a>
+        </div>
+        <div class="cards cards--grid" id="saleCards"></div>
+      </div>
+    </section>
+
+    <!-- ============ TIN CHO THUÊ ============ -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2>Nhà đất cho thuê mới đăng</h2>
+            <p class="muted">Căn hộ, nhà nguyên căn, phòng trọ, văn phòng, mặt bằng</p>
+          </div>
+          <a href="tim-kiem.html?mode=thue" class="see-all">Xem tất cả →</a>
+        </div>
+        <div class="cards cards--grid" id="rentCards"></div>
+      </div>
+    </section>
+
+    <!-- ============ KHU VỰC ============ -->
+    <section class="section" id="locations">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2>Bất động sản theo khu vực</h2>
+            <p class="muted">Khám phá tin rao tại các tỉnh thành sôi động nhất</p>
+          </div>
+        </div>
+        <div class="locations" id="locationGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ DỰ ÁN ============ -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2>Dự án nổi bật</h2>
+            <p class="muted">Các dự án đang mở bán và sắp ra mắt</p>
+          </div>
+          <a href="du-an.html" class="see-all">Xem tất cả →</a>
+        </div>
+        <div class="projects" id="projectGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ TIỆN ÍCH ============ -->
+    <section class="section">
+      <div class="container tools">
+        <button class="tool" data-tool="loan">
+          <span class="tool__icon">%</span>
+          <span><strong>Tính lãi vay mua nhà</strong><small>Ước tính số tiền phải trả hàng tháng theo lãi suất và thời hạn vay.</small></span>
+        </button>
+        <a class="tool" href="dang-tin.html">
+          <span class="tool__icon">+</span>
+          <span><strong>Đăng tin miễn phí</strong><small>Tiếp cận hàng nghìn người mua, người thuê chỉ trong vài phút.</small></span>
+        </a>
+        <a class="tool" href="da-luu.html">
+          <span class="tool__icon">♥</span>
+          <span><strong>Tin đã lưu</strong><small>Xem lại danh sách những căn nhà bạn quan tâm.</small></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ============ CẨM NANG ============ -->
+    <section class="section section--alt" id="news">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2>Cẩm nang nhà đất</h2>
+            <p class="muted">Kiến thức hữu ích cho người mua, bán và thuê nhà</p>
+          </div>
+        </div>
+        <div class="news" id="newsGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

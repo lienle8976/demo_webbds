@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng tin bất động sản — Tổ Ấm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="post">
+  <div id="header"></div>
+
+  <main class="container page">
+    <nav class="crumbs"><a href="index.html">Trang chủ</a> / Đăng tin</nav>
+    <h1 class="page-title">Đăng tin bất động sản</h1>
+    <p class="muted">Tin đăng được lưu trên trình duyệt của bạn (bản demo) và hiển thị ngay trong kết quả tìm kiếm.</p>
+
+    <div class="post-layout">
+      <form class="post-form" id="postForm" novalidate>
+        <div class="form-card">
+          <h3>Thông tin cơ bản</h3>
+          <fieldset class="seg">
+            <label><input type="radio" name="mode" value="ban" checked /><span>Bán</span></label>
+            <label><input type="radio" name="mode" value="thue" /><span>Cho thuê</span></label>
+          </fieldset>
+          <div class="grid-2">
+            <label>Loại nhà đất *<select name="type" required></select></label>
+            <label>Tỉnh/thành *<select name="city" required></select></label>
+            <label>Quận/huyện, khu vực *<select name="district" required></select></label>
+            <label>Đường/phố<input name="street" placeholder="VD: Trần Duy Hưng" /></label>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3>Thông tin bài viết</h3>
+          <label>Tiêu đề *<input name="title" required minlength="20" maxlength="120" placeholder="VD: Bán căn hộ 2PN 70m² view hồ, full nội thất" /></label>
+          <label>Mô tả *<textarea name="description" rows="6" required minlength="30" placeholder="Mô tả chi tiết vị trí, tiện ích, pháp lý..."></textarea></label>
+        </div>
+
+        <div class="form-card">
+          <h3>Thông tin bất động sản</h3>
+          <div class="grid-3">
+            <label><span><span id="priceLabel">Giá (triệu đồng)</span> *</span><input name="price" type="number" min="1" required /></label>
+            <label>Diện tích (m²) *<input name="area" type="number" min="5" required /></label>
+            <label>Số tầng<input name="floors" type="number" min="0" max="100" value="0" /></label>
+            <label>Phòng ngủ<input name="beds" type="number" min="0" max="20" value="0" /></label>
+            <label>Phòng tắm, WC<input name="baths" type="number" min="0" max="20" value="0" /></label>
+            <label>Hướng nhà
+              <select name="direction">
+                <option value="">Chọn hướng</option>
+                <option>Đông</option><option>Tây</option><option>Nam</option><option>Bắc</option>
+                <option>Đông Nam</option><option>Đông Bắc</option><option>Tây Nam</option><option>Tây Bắc</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid-2">
+            <label class="legal-field">Pháp lý
+              <select name="legal"><option>Sổ đỏ/Sổ hồng</option><option>Hợp đồng mua bán</option><option>Đang chờ sổ</option></select>
+            </label>
+            <label>Nội thất
+              <select name="furniture"><option>Đầy đủ</option><option>Cơ bản</option><option>Không nội thất</option></select>
+            </label>
+          </div>
+          <label>Link ảnh (không bắt buộc)<input name="image" type="url" placeholder="https://..." /></label>
+        </div>
+
+        <div class="form-card">
+          <h3>Thông tin liên hệ & gói tin</h3>
+          <div class="grid-2">
+            <label>Tên liên hệ *<input name="name" required /></label>
+            <label>Số điện thoại *<input name="phone" required pattern="[0-9 +]{9,13}" /></label>
+          </div>
+          <fieldset class="seg seg--3">
+            <label><input type="radio" name="vip" value="" checked /><span>Tin thường<small>Miễn phí</small></span></label>
+            <label><input type="radio" name="vip" value="VIP" /><span>Tin VIP<small>Ưu tiên hiển thị</small></span></label>
+            <label><input type="radio" name="vip" value="Kim cương" /><span>Kim cương<small>Luôn ở đầu trang</small></span></label>
+          </fieldset>
+        </div>
+
+        <p class="form-error" id="formError"></p>
+        <button class="btn btn--primary btn--lg btn--block">Đăng tin</button>
+      </form>
+
+      <aside class="post-preview">
+        <h3>Xem trước tin đăng</h3>
+        <div id="preview"></div>
+        <p class="muted small">Thẻ tin sẽ hiển thị như trên trong trang tìm kiếm.</p>
+      </aside>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
