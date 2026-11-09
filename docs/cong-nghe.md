@@ -14,6 +14,7 @@ Tài liệu mô tả các công nghệ, thư viện, dịch vụ bên ngoài và
 | Bản đồ | Google Maps nhúng (iframe) | Không cần API key |
 | Chạy local | Python `http.server` cổng 8000 | Tự bật qua hook của Claude Code |
 | Kiểm thử | Microsoft Edge headless | Chụp màn hình, bắt lỗi JS |
+| Triển khai | Vercel (site tĩnh) | Tự deploy khi push lên `main` |
 | Phát triển | Git, Claude Code, PowerShell / Git Bash | |
 
 Quy mô hiện tại: 7 trang HTML, ~600 dòng CSS, ~1.100 dòng JavaScript.
@@ -100,7 +101,13 @@ Khóa `localStorage` đang dùng: `toam_favs`, `toam_my_listings`, `toam_user`, 
 | **Unsplash** (`images.unsplash.com`) | Ảnh tin, dự án, khu vực, bài viết | Mất mạng → hiện nền gradient thay thế |
 | **Google Maps embed** (`maps.google.com/maps?...&output=embed`) | Bản đồ ở trang chi tiết | Không cần API key; mất mạng → khung trống |
 
-Không có dịch vụ nào cần tài khoản hay khóa bí mật.
+Website không gọi dịch vụ nào cần tài khoản hay khóa bí mật.
+
+### Triển khai: Vercel
+- Project Vercel liên kết với repo GitHub `lienle8976/demo_webbds`. Mỗi lần push lên nhánh `main`, Vercel tự deploy lại.
+- Cấu hình: Framework Preset **Other**, không có lệnh build, thư mục gốc là thư mục dự án.
+- Tên miền: `webbdsnew.vercel.app` (và tên mặc định `demowebbds-seven.vercel.app`).
+- File `.vercelignore` chỉ cho đưa lên các trang `*.html`, `css/`, `js/`. Nhờ vậy `CLAUDE.md`, `.claude/`, `docs/`, `README.md` không bị lộ công khai. **Thêm thư mục mới mà website cần (ví dụ `img/`) thì phải thêm dòng `!img` vào `.vercelignore`.**
 
 ## 5. Công cụ phát triển
 

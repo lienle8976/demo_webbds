@@ -15,6 +15,7 @@ Hướng dẫn cho Claude Code khi làm việc trong dự án này.
 - **Web server Python cổng 8000 tự bật mỗi khi mở phiên Claude Code** (hook `SessionStart` trong `.claude/settings.json` → `.claude/hooks/start-server.ps1`). Website ở **http://localhost:8000/** — dùng địa chỉ này khi mở/kiểm tra trang thay cho `file:///`. Nếu cổng 8000 đã bận, hook không bật thêm server.
 - Bật tay nếu cần: `python -m http.server 8000` trong thư mục dự án. Tắt server: tìm PID bằng `netstat -ano | findstr :8000` rồi `Stop-Process -Id <PID>`.
 - Máy phát triển (Windows) **không có Node**. Kiểm tra bằng Edge headless — xem skill `/kiem-tra`.
+- **Bản chạy thật trên Vercel:** https://webbdsnew.vercel.app/. Repo `lienle8976/demo_webbds`, Vercel tự deploy khi push lên `main`. `.vercelignore` chỉ đưa lên `*.html`, `css/`, `js/`; thêm thư mục tài nguyên mới thì phải mở nó trong `.vercelignore`.
 - Sau khi sửa, luôn kiểm tra cả 6 trang không có lỗi JS và chụp màn hình trang bị ảnh hưởng (desktop 1366px + mobile 390px).
 
 ## Cấu trúc

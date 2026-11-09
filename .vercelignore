@@ -1,0 +1,6 @@
+# Chỉ đưa lên Vercel những file website cần: các trang HTML, css/, js/.
+# Mọi thứ khác (CLAUDE.md, .claude/, docs/, README.md...) không được phục vụ công khai.
+/*
+!*.html
+!css
+!js
