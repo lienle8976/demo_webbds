@@ -1,6 +1,6 @@
 ---
 name: them-trang
-description: Thêm một trang HTML mới vào website Tổ Ấm theo đúng quy ước của dự án (header/footer dùng chung, data-page, hàm pageXxx trong app.js, tham số URL). Dùng khi người dùng muốn tạo trang mới như trang tin tức, liên hệ, môi giới, quản lý tin đăng...
+description: Thêm một trang HTML mới vào website My Home theo đúng quy ước của dự án (header/footer dùng chung, data-page, hàm pageXxx trong app.js, tham số URL). Dùng khi người dùng muốn tạo trang mới như trang tin tức, liên hệ, môi giới, quản lý tin đăng...
 ---
 
 # Thêm trang mới

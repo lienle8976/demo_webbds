@@ -1,6 +1,6 @@
 ---
 name: kiem-tra
-description: Kiểm tra website Tổ Ấm bằng Edge headless — tải cả 6 trang, bắt lỗi JavaScript, đếm phần tử render và chụp màn hình desktop/mobile. Dùng sau mỗi lần sửa HTML/CSS/JS hoặc khi người dùng yêu cầu kiểm tra, chạy thử, chụp màn hình.
+description: Kiểm tra website My Home bằng Edge headless — tải cả 6 trang, bắt lỗi JavaScript, đếm phần tử render và chụp màn hình desktop/mobile. Dùng sau mỗi lần sửa HTML/CSS/JS hoặc khi người dùng yêu cầu kiểm tra, chạy thử, chụp màn hình.
 ---
 
 # Kiểm tra website bằng Edge headless

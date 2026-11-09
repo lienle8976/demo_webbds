@@ -4,7 +4,7 @@ Hướng dẫn cho Claude Code khi làm việc trong dự án này.
 
 ## Tổng quan
 
-**Tổ Ấm** — website rao vặt bất động sản (mua bán, cho thuê, dự án), lấy cảm hứng tính năng từ batdongsan.com nhưng dùng thương hiệu và giao diện riêng. Không sao chép logo, tên, nhận diện của batdongsan.com.
+**My Home** — website rao vặt bất động sản (mua bán, cho thuê, dự án), lấy cảm hứng tính năng từ batdongsan.com nhưng dùng thương hiệu và giao diện riêng. Không sao chép logo, tên, nhận diện của batdongsan.com.
 
 - HTML/CSS/JavaScript thuần, **không framework, không build, không npm**.
 - Không có backend: dữ liệu mẫu nằm trong `js/data.js`, dữ liệu người dùng lưu `localStorage`.
@@ -45,7 +45,7 @@ Khi thêm/bỏ công nghệ, thư viện, dịch vụ bên ngoài hoặc công c
 
 ### Dữ liệu và URL
 - Các trang truyền trạng thái qua query string: `tim-kiem.html?mode=&city=&type=&price=&area=&beds=&q=&sort=&page=`, `chi-tiet.html?id=`, `du-an.html?city=&status=&q=`. Dùng hàm `qs()` để tạo URL (tự bỏ giá trị rỗng).
-- Khóa `localStorage`: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts`. Đọc/ghi qua `store.get/set`.
+- Khóa `localStorage`: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts`. Đọc/ghi qua `store.get/set`. Tiền tố `toam_` là từ tên cũ "Tổ Ấm" — **giữ nguyên**, đổi sẽ làm mất dữ liệu đã lưu của người dùng.
 - Dữ liệu mẫu sinh bằng RNG có seed cố định (`mulberry32`) — đổi seed hoặc thứ tự gọi `rand()` sẽ làm thay đổi toàn bộ tin mẫu.
 - Mọi chuỗi do người dùng nhập hoặc từ dữ liệu khi chèn vào HTML phải qua `esc()`.
 

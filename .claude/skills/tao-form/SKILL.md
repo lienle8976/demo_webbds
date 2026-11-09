@@ -1,10 +1,10 @@
 ---
 name: tao-form
-description: Tạo form (liên hệ, tư vấn, đăng ký nhận báo giá, ký gửi, báo lỗi...) cho website Tổ Ấm theo đúng quy ước dự án. Mọi form luôn BẮT BUỘC có 4 trường họ tên, email, số điện thoại, mô tả thông tin; kiểm tra bằng validateForm() với thông báo tiếng Việt, lưu localStorage, hiện trạng thái gửi thành công. Dùng khi người dùng yêu cầu tạo/thêm/sửa một form nhập thông tin.
+description: Tạo form (liên hệ, tư vấn, đăng ký nhận báo giá, ký gửi, báo lỗi...) cho website My Home theo đúng quy ước dự án. Mọi form luôn BẮT BUỘC có 4 trường họ tên, email, số điện thoại, mô tả thông tin; kiểm tra bằng validateForm() với thông báo tiếng Việt, lưu localStorage, hiện trạng thái gửi thành công. Dùng khi người dùng yêu cầu tạo/thêm/sửa một form nhập thông tin.
 argument-hint: "[loại form] [ở trang nào] — VD: form ký gửi nhà trên trang ky-gui"
 ---
 
-# Tạo form trong website Tổ Ấm
+# Tạo form trong website My Home
 
 ## Yêu cầu lần này
 

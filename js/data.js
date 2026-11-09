@@ -1,5 +1,5 @@
 /* =========================================================
-   Dữ liệu mẫu cho Tổ Ấm (sinh ngẫu nhiên có seed cố định)
+   Dữ liệu mẫu cho My Home (sinh ngẫu nhiên có seed cố định)
    ========================================================= */
 (function () {
   // RNG có seed để dữ liệu giống nhau mỗi lần tải trang

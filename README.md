@@ -1,6 +1,6 @@
 # demo_webbds
 
-Website rao vặt bất động sản **Tổ Ấm** (mua bán, cho thuê nhà đất, dự án), viết bằng HTML/CSS/JavaScript thuần, không cần cài đặt hay build.
+Website rao vặt bất động sản **My Home** (mua bán, cho thuê nhà đất, dự án), viết bằng HTML/CSS/JavaScript thuần, không cần cài đặt hay build.
 
 ## Cách chạy
 

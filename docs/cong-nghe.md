@@ -1,6 +1,6 @@
-# Công nghệ sử dụng trong dự án Tổ Ấm
+# Công nghệ sử dụng trong dự án My Home
 
-Tài liệu mô tả các công nghệ, thư viện, dịch vụ bên ngoài và công cụ phát triển mà website **Tổ Ấm** (rao vặt bất động sản) đang dùng, kèm lý do chọn và giới hạn hiện tại.
+Tài liệu mô tả các công nghệ, thư viện, dịch vụ bên ngoài và công cụ phát triển mà website **My Home** (rao vặt bất động sản) đang dùng, kèm lý do chọn và giới hạn hiện tại.
 
 ## Tóm tắt
 

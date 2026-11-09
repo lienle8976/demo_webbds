@@ -1,4 +1,4 @@
-﻿# Hook SessionStart: bật web server Python ở cổng 8000 cho website Tổ Ấm.
+﻿# Hook SessionStart: bật web server Python ở cổng 8000 cho website My Home.
 # - Nếu cổng 8000 đã có tiến trình lắng nghe thì không chạy thêm.
 # - Server chạy nền (ẩn cửa sổ), phục vụ thư mục gốc dự án.
 # - In JSON để Claude biết địa chỉ server và người dùng thấy thông báo.

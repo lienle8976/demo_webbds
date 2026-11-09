@@ -1,5 +1,5 @@
 /* =========================================================
-   Tổ Ấm — logic dùng chung + từng trang
+   My Home — logic dùng chung + từng trang
    Mỗi trang khai báo <body data-page="..."> để chạy đúng phần logic.
    ========================================================= */
 (function () {
@@ -115,7 +115,7 @@
     <span class="logo__mark">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg>
     </span>
-    <span class="logo__text">Tổ Ấm<small>Nhà đất toàn quốc</small></span>`;
+    <span class="logo__text">My Home<small>Nhà đất toàn quốc</small></span>`;
 
   function renderLayout() {
     const activeNav = PAGE === 'search' ? (PARAMS.get('mode') || 'ban') : PAGE;
@@ -179,10 +179,10 @@
               <input type="email" placeholder="Email của bạn" required />
               <button class="btn btn--primary" type="submit">Gửi</button>
             </form>
-            <p class="footer__desc">Hotline: 1900 0000 · Email: hotro@toam.example</p>
+            <p class="footer__desc">Hotline: 1900 0000 · Email: hotro@myhome.example</p>
           </div>
         </div>
-        <div class="footer__bottom container">© ${new Date().getFullYear()} Tổ Ấm. Dữ liệu trong trang là dữ liệu mẫu.</div>
+        <div class="footer__bottom container">© ${new Date().getFullYear()} My Home. Dữ liệu trong trang là dữ liệu mẫu.</div>
       </footer>`;
 
     document.body.insertAdjacentHTML('beforeend', `
@@ -580,7 +580,7 @@
       const typeName = s.type ? typesFor(s.mode).find((t) => t.id === s.type)?.name : '';
       const title = `${typeName ? (s.mode === 'ban' ? 'Bán ' : s.mode === 'thue' ? 'Cho thuê ' : '') + typeName.toLowerCase() : label} ${s.city ? 'tại ' + cityName(s.city) : 'trên toàn quốc'}`;
       $('#resultTitle').textContent = title;
-      document.title = `${title} — Tổ Ấm`;
+      document.title = `${title} — My Home`;
       $('#crumbCurrent').textContent = label;
       $('#resultMeta').textContent = `Hiện có ${list.length.toLocaleString('vi-VN')} bất động sản.`;
 
@@ -658,7 +658,7 @@
       root.innerHTML = emptyHtml('Tin đăng không tồn tại', 'Tin có thể đã bị gỡ hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="tim-kiem.html">Xem tin khác</a>');
       return;
     }
-    document.title = `${l.title} — Tổ Ấm`;
+    document.title = `${l.title} — My Home`;
     const specs = [
       ['Loại hình', l.typeName],
       ['Mức giá', formatPrice(l)],
