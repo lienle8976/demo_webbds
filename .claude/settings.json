@@ -6,7 +6,8 @@
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(npx serve:*)",
-      "Bash(python -m http.server:*)"
+      "Bash(python -m http.server:*)",
+      "Bash(python tools/dev_server.py:*)"
     ],
     "deny": [
       "Read(./.env)",

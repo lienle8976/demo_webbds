@@ -1,6 +1,13 @@
 # Cài đặt Claude Code cá nhân (không chia sẻ)
 .claude/settings.local.json
 
+# Bí mật (API key...) — không bao giờ commit
+.env
+.env.*
+
+# Python
+__pycache__/
+
 # Hệ điều hành / editor
 .DS_Store
 Thumbs.db

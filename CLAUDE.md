@@ -7,15 +7,16 @@ Hướng dẫn cho Claude Code khi làm việc trong dự án này.
 **My Home** — website rao vặt bất động sản (mua bán, cho thuê, dự án), lấy cảm hứng tính năng từ batdongsan.com nhưng dùng thương hiệu và giao diện riêng. Không sao chép logo, tên, nhận diện của batdongsan.com.
 
 - HTML/CSS/JavaScript thuần, **không framework, không build, không npm**.
-- Không có backend: dữ liệu mẫu nằm trong `js/data.js`, dữ liệu người dùng lưu `localStorage`.
+- Không có backend: dữ liệu mẫu nằm trong `js/data.js`, dữ liệu người dùng lưu `localStorage`. Ngoại lệ duy nhất: `POST /api/chat` cho chatbox AI (Vercel Function `api/chat.js`, chuyển tiếp tới Google Gemini).
+- **API key (Gemini...) không bao giờ đưa vào code phía trình duyệt hay commit lên git.** Key chỉ nằm ở biến môi trường `GEMINI_API_KEY`: trên Vercel (Settings → Environment Variables) và trên máy (biến môi trường tài khoản Windows hoặc `.env.local`).
 - Toàn bộ chữ trên giao diện và comment trong code viết **tiếng Việt**.
 
 ## Chạy và kiểm tra
 
-- **Web server Python cổng 8000 tự bật mỗi khi mở phiên Claude Code** (hook `SessionStart` trong `.claude/settings.json` → `.claude/hooks/start-server.ps1`). Website ở **http://localhost:8000/** — dùng địa chỉ này khi mở/kiểm tra trang thay cho `file:///`. Nếu cổng 8000 đã bận, hook không bật thêm server.
-- Bật tay nếu cần: `python -m http.server 8000` trong thư mục dự án. Tắt server: tìm PID bằng `netstat -ano | findstr :8000` rồi `Stop-Process -Id <PID>`.
+- **Web server Python cổng 8000 tự bật mỗi khi mở phiên Claude Code** (hook `SessionStart` trong `.claude/settings.json` → `.claude/hooks/start-server.ps1` → `tools/dev_server.py`). Website ở **http://localhost:8000/** — dùng địa chỉ này khi mở/kiểm tra trang thay cho `file:///`. Nếu cổng 8000 đã bận, hook không bật thêm server.
+- `tools/dev_server.py` = `http.server` + `POST /api/chat` (bản sao logic của `api/chat.js` — **sửa một bên thì sửa cả bên kia**). Bật tay: `python tools/dev_server.py 8000`. Tắt server: tìm PID bằng `netstat -ano | findstr :8000` rồi `Stop-Process -Id <PID>`. Trên Windows hai server có thể cùng giữ cổng 8000 — kiểm tra bằng `Get-CimInstance Win32_Process -Filter "Name like 'python%'"` và tắt `http.server` cũ nếu còn.
 - Máy phát triển (Windows) **không có Node**. Kiểm tra bằng Edge headless — xem skill `/kiem-tra`.
-- **Bản chạy thật trên Vercel:** https://webbdsnew.vercel.app/. Repo `lienle8976/demo_webbds`, Vercel tự deploy khi push lên `main`. `.vercelignore` chỉ đưa lên `*.html`, `css/`, `js/`; thêm thư mục tài nguyên mới thì phải mở nó trong `.vercelignore`.
+- **Bản chạy thật trên Vercel:** https://webbdsnew.vercel.app/. Repo `lienle8976/demo_webbds`, Vercel tự deploy khi push lên `main`. `.vercelignore` chỉ đưa lên `*.html`, `css/`, `js/`, `api/`; thêm thư mục tài nguyên mới thì phải mở nó trong `.vercelignore`.
 - Sau khi sửa, luôn kiểm tra cả 6 trang không có lỗi JS và chụp màn hình trang bị ảnh hưởng (desktop 1366px + mobile 390px).
 
 ## Cấu trúc
@@ -30,7 +31,9 @@ da-luu.html     Tin đã lưu (data-page="saved")
 lien-he.html    Form liên hệ + thông tin + FAQ (data-page="contact")
 css/style.css   Toàn bộ giao diện
 js/data.js      Dữ liệu mẫu → window.APP_DATA
-js/app.js       Layout chung + logic từng trang
+js/app.js       Layout chung + chatbox + logic từng trang
+api/chat.js     Vercel Function: chuyển tiếp chatbox tới Gemini (key ở biến môi trường)
+tools/dev_server.py  Server chạy trên máy: file tĩnh + /api/chat
 docs/cong-nghe.md  Tài liệu công nghệ sử dụng
 ```
 
@@ -40,12 +43,12 @@ Khi thêm/bỏ công nghệ, thư viện, dịch vụ bên ngoài hoặc công c
 
 ### Trang
 - Mỗi trang có `<body data-page="...">`, `<div id="header">`, `<div id="footer">`, rồi nạp `js/data.js` **trước** `js/app.js`.
-- Header, footer, modal, toast được `renderLayout()` trong `app.js` chèn vào — **sửa menu/footer ở `app.js`**, không sửa từng file HTML.
+- Header, footer, modal, toast được `renderLayout()` trong `app.js` chèn vào; chatbox góc phải dưới do `renderChatbox()` chèn (ngữ cảnh/quy tắc trả lời của trợ lý ở `chatSystemPrompt()`) — **sửa menu/footer ở `app.js`**, không sửa từng file HTML.
 - Logic từng trang là một hàm `pageXxx()` trong `app.js`, đăng ký trong object ở cuối file.
 
 ### Dữ liệu và URL
 - Các trang truyền trạng thái qua query string: `tim-kiem.html?mode=&city=&type=&price=&area=&beds=&q=&sort=&page=`, `chi-tiet.html?id=`, `du-an.html?city=&status=&q=`. Dùng hàm `qs()` để tạo URL (tự bỏ giá trị rỗng).
-- Khóa `localStorage`: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts`. Đọc/ghi qua `store.get/set`. Tiền tố `toam_` là từ tên cũ "Tổ Ấm" — **giữ nguyên**, đổi sẽ làm mất dữ liệu đã lưu của người dùng.
+- Khóa `localStorage`: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts`, `toam_chat` (lịch sử chatbox). Đọc/ghi qua `store.get/set`. Tiền tố `toam_` là từ tên cũ "Tổ Ấm" — **giữ nguyên**, đổi sẽ làm mất dữ liệu đã lưu của người dùng.
 - Dữ liệu mẫu sinh bằng RNG có seed cố định (`mulberry32`) — đổi seed hoặc thứ tự gọi `rand()` sẽ làm thay đổi toàn bộ tin mẫu.
 - Mọi chuỗi do người dùng nhập hoặc từ dữ liệu khi chèn vào HTML phải qua `esc()`.
 

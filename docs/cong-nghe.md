@@ -9,17 +9,18 @@ Tài liệu mô tả các công nghệ, thư viện, dịch vụ bên ngoài và
 | Giao diện | HTML5, CSS3 | Không dùng framework CSS, không preprocessor |
 | Logic | JavaScript thuần (ES2021) | Không framework, không bundler, không npm |
 | Dữ liệu | Dữ liệu mẫu trong `js/data.js` + `localStorage` | Chưa có backend, chưa có cơ sở dữ liệu |
+| Chatbox AI | Google Gemini API qua Vercel Function `api/chat.js` | Key ở biến môi trường `GEMINI_API_KEY`, không nằm trong code |
 | Font | Google Fonts — Be Vietnam Pro | Hỗ trợ tiếng Việt đầy đủ |
 | Ảnh | Unsplash (CDN) | Cần kết nối mạng |
 | Bản đồ | Google Maps nhúng (iframe) | Không cần API key |
-| Chạy local | Python `http.server` cổng 8000 | Tự bật qua hook của Claude Code |
+| Chạy local | Python `tools/dev_server.py` cổng 8000 (`http.server` + `/api/chat`) | Tự bật qua hook của Claude Code |
 | Kiểm thử | Microsoft Edge headless | Chụp màn hình, bắt lỗi JS |
 | Triển khai | Vercel (site tĩnh) | Tự deploy khi push lên `main` |
 | Phát triển | Git, Claude Code, PowerShell / Git Bash | |
 
 Quy mô hiện tại: 7 trang HTML, ~600 dòng CSS, ~1.100 dòng JavaScript.
 
-**Không cần cài đặt gì để chạy website** — chỉ cần một trình duyệt hiện đại.
+**Không cần cài đặt gì để chạy website** — chỉ cần một trình duyệt hiện đại. Riêng chatbox AI cần máy chủ (`/api/chat`) có `GEMINI_API_KEY`; mở bằng `file:///` hoặc server không có key thì chatbox báo chưa kết nối được, phần còn lại vẫn chạy bình thường.
 
 ---
 
@@ -91,7 +92,12 @@ API trình duyệt và cú pháp đáng chú ý:
 | Template literals | Dựng HTML; mọi dữ liệu chèn vào đều qua hàm `esc()` để chống XSS |
 | `?.`, `??`, `||=` | Cú pháp ES2020–ES2021 cho code gọn |
 
-Khóa `localStorage` đang dùng: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts` (yêu cầu liên hệ).
+Khóa `localStorage` đang dùng: `toam_favs`, `toam_my_listings`, `toam_user`, `toam_view`, `toam_contacts` (yêu cầu liên hệ), `toam_chat` (30 tin nhắn chatbox gần nhất).
+
+### Chatbox trợ lý AI
+- `renderChatbox()` chèn nút tròn góc phải dưới + khung chat vào mọi trang (cạnh `renderLayout()`).
+- Mỗi câu hỏi gửi `POST /api/chat` với `{ system, messages }`: `system` do `chatSystemPrompt()` dựng gồm quy tắc trả lời, trang đang xem (ở trang chi tiết có cả nội dung tin) và danh sách tin/dự án rút gọn, để trợ lý chỉ giới thiệu tin có thật trên web; `messages` là 12 lượt gần nhất.
+- Câu trả lời được `esc()` trước, rồi chỉ cho phép `**đậm**`, gạch đầu dòng và link markdown tới các trang `*.html` của web (không cho link ra ngoài).
 
 ## 4. Dịch vụ bên ngoài
 
@@ -100,21 +106,24 @@ Khóa `localStorage` đang dùng: `toam_favs`, `toam_my_listings`, `toam_user`, 
 | **Google Fonts** — Be Vietnam Pro (400–800) | Toàn bộ chữ | Mất mạng → rơi về font hệ thống |
 | **Unsplash** (`images.unsplash.com`) | Ảnh tin, dự án, khu vực, bài viết | Mất mạng → hiện nền gradient thay thế |
 | **Google Maps embed** (`maps.google.com/maps?...&output=embed`) | Bản đồ ở trang chi tiết | Không cần API key; mất mạng → khung trống |
+| **Google Gemini API** (`generativelanguage.googleapis.com`) | Chatbox trợ lý AI, gọi từ máy chủ (`api/chat.js` / `tools/dev_server.py`) | Cần `GEMINI_API_KEY`. Model `gemini-3.5-flash-lite`, quá tải (429/503) hoặc không còn (404) → tự thử `gemini-flash-lite-latest`, `gemini-flash-latest` |
 
-Website không gọi dịch vụ nào cần tài khoản hay khóa bí mật.
+Chỉ chatbox cần khóa bí mật (`GEMINI_API_KEY`), và khóa này **chỉ nằm ở máy chủ**: Vercel → Project → Settings → Environment Variables; trên máy là biến môi trường tài khoản Windows (hoặc file `.env.local`, đã nằm trong `.gitignore`). Trình duyệt không bao giờ thấy key. Máy chủ giới hạn 12 tin nhắn × 1.000 ký tự và 800 token trả lời mỗi lượt để hạn chế bị lạm dụng.
 
 ### Triển khai: Vercel
 - Project Vercel liên kết với repo GitHub `lienle8976/demo_webbds`. Mỗi lần push lên nhánh `main`, Vercel tự deploy lại.
 - Cấu hình: Framework Preset **Other**, không có lệnh build, thư mục gốc là thư mục dự án.
 - Tên miền: `webbdsnew.vercel.app` (và tên mặc định `demowebbds-seven.vercel.app`).
-- File `.vercelignore` chỉ cho đưa lên các trang `*.html`, `css/`, `js/`. Nhờ vậy `CLAUDE.md`, `.claude/`, `docs/`, `README.md` không bị lộ công khai. **Thêm thư mục mới mà website cần (ví dụ `img/`) thì phải thêm dòng `!img` vào `.vercelignore`.**
+- Thư mục `api/` được Vercel tự chạy thành Vercel Functions (Node.js, không cần `package.json`): `api/chat.js` → `POST /api/chat`.
+- File `.vercelignore` chỉ cho đưa lên các trang `*.html`, `css/`, `js/`, `api/`. Nhờ vậy `CLAUDE.md`, `.claude/`, `docs/`, `README.md` không bị lộ công khai. **Thêm thư mục mới mà website cần (ví dụ `img/`) thì phải thêm dòng `!img` vào `.vercelignore`.**
 
 ## 5. Công cụ phát triển
 
-### Python `http.server`
-- Phục vụ website tại **http://localhost:8000/**.
+### Python `tools/dev_server.py`
+- Phục vụ website tại **http://localhost:8000/** (dựa trên `http.server` của Python, không cần cài thêm thư viện) và thêm `POST /api/chat` giống hệt `api/chat.js` để chatbox chạy được trên máy.
+- Key đọc lần lượt từ: biến môi trường của tiến trình → biến môi trường tài khoản Windows `GEMINI_API_KEY` → file `.env.local`.
 - Tự bật mỗi khi mở phiên Claude Code nhờ hook `SessionStart` (`.claude/settings.json` → `.claude/hooks/start-server.ps1`). Nếu cổng đã bận thì không bật thêm.
-- Bật tay: `python -m http.server 8000`.
+- Bật tay: `python tools/dev_server.py 8000`.
 
 ### Microsoft Edge headless
 Dùng để kiểm thử tự động vì máy không có Node.js:

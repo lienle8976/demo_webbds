@@ -219,6 +219,148 @@
     document.body.style.overflow = '';
   }
 
+  /* ================= Chatbox trợ lý AI (góc phải dưới) =================
+     Gọi POST /api/chat (Vercel Function api/chat.js, hoặc tools/dev_server.py khi chạy trên máy).
+     API key Gemini chỉ nằm ở máy chủ — KHÔNG bao giờ đưa key vào file JS này. */
+  const CHAT_STORE = 'toam_chat';
+  const CHAT_GREETING = 'Xin chào! Mình là trợ lý My Home. Bạn đang tìm mua, thuê nhà hay muốn hỏi về dự án nào? Hãy cho mình biết khu vực và ngân sách nhé.';
+  let chatHistory = store.get(CHAT_STORE, []);
+  let chatBusy = false;
+
+  // Ngữ cảnh gửi kèm: quy tắc trả lời + danh sách tin/dự án đang có trên web
+  function chatSystemPrompt() {
+    const listingLines = all.slice(0, 90).map((l) =>
+      `${l.id} | ${l.mode === 'thue' ? 'Cho thuê' : 'Bán'} | ${l.typeName} | ${l.district}, ${l.city} | ${formatPrice(l)} | ${l.area}m²${l.beds ? ` | ${l.beds}PN` : ''}${l.vip ? ` | ${l.vip}` : ''}`).join('\n');
+    const projectLines = projects.map((p) => `${p.name} | ${p.kind} | ${p.district}, ${p.city} | ${p.status} | từ ${p.priceFrom} triệu/m²`).join('\n');
+    const current = PAGE === 'detail' && all.find((x) => x.id === PARAMS.get('id'));
+    return [
+      'Bạn là "Trợ lý My Home" — trợ lý tư vấn bất động sản của website rao vặt nhà đất My Home.',
+      'QUY TẮC:',
+      '- Luôn trả lời bằng tiếng Việt, thân thiện, ngắn gọn (tối đa khoảng 120 từ), dùng gạch đầu dòng khi liệt kê.',
+      '- Chỉ giới thiệu tin đăng và dự án có trong DỮ LIỆU bên dưới, không bịa thêm tin, giá hay số điện thoại.',
+      '- Khi giới thiệu một tin, kèm link dạng markdown: [mô tả ngắn](chi-tiet.html?id=MÃ_TIN). Giới thiệu tối đa 4 tin mỗi lần.',
+      '- Link tìm kiếm: [Xem thêm](tim-kiem.html?mode=ban|thue&city=MÃ_TP). Mã thành phố: ' + CITIES.map((c) => `${c.id}=${c.name}`).join(', ') + '. Trang dự án: du-an.html. Đăng tin: dang-tin.html. Liên hệ tư vấn viên: lien-he.html.',
+      '- Nếu không có tin phù hợp, nói rõ và gợi ý nới tiêu chí (khu vực, ngân sách, diện tích).',
+      '- Không xin số điện thoại/email trong chat; nếu khách muốn được gọi lại, hướng dẫn điền form ở lien-he.html hoặc gọi hotline 1900 0000.',
+      '- Về pháp lý, vay vốn: chỉ đưa thông tin tham khảo chung và khuyên kiểm tra với chuyên gia.',
+      '- Lịch sự từ chối các chủ đề không liên quan bất động sản.',
+      '- Đây là website demo, dữ liệu là dữ liệu mẫu.',
+      '',
+      `Người dùng đang ở trang: ${document.title}.`,
+      current ? `TIN ĐANG XEM (${current.id}): ${current.title}\nGiá: ${formatPrice(current)} · ${formatPpm(current)}\nĐịa chỉ: ${current.address}\n${current.description}` : '',
+      '',
+      'DỮ LIỆU — TIN ĐĂNG (mã | nhu cầu | loại | khu vực | giá | diện tích | phòng ngủ | gói):',
+      listingLines,
+      '',
+      'DỮ LIỆU — DỰ ÁN (tên | loại | khu vực | trạng thái | giá):',
+      projectLines,
+    ].join('\n');
+  }
+
+  // Định dạng câu trả lời: thoát HTML trước, rồi chỉ cho phép **đậm** và link tới các trang của web
+  function chatFormat(text) {
+    return esc(text)
+      .replace(/\[([^\]]+)\]\(((?:index|tim-kiem|chi-tiet|dang-tin|du-an|da-luu|lien-he)\.html[^\s)]*)\)/g, '<a href="$2">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/^\s*[-*]\s+/gm, '• ');
+  }
+
+  function chatBubble(role, html, extra = '') {
+    return `<div class="chat__msg chat__msg--${role} ${extra}"><div class="chat__bubble">${html}</div></div>`;
+  }
+
+  function renderChat() {
+    const body = $('#chatBody');
+    body.innerHTML = chatBubble('model', esc(CHAT_GREETING)) +
+      chatHistory.map((m) => chatBubble(m.role, m.role === 'model' ? chatFormat(m.text) : esc(m.text))).join('') +
+      (chatBusy ? chatBubble('model', '<span class="chat__typing"><i></i><i></i><i></i></span>', 'is-typing') : '');
+    $('#chatChips').hidden = chatHistory.length > 0;
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendChat(text) {
+    text = text.trim().slice(0, 1000);
+    if (!text || chatBusy) return;
+    chatHistory.push({ role: 'user', text });
+    chatBusy = true;
+    $('#chatForm').elements.q.value = '';
+    $('#chatSend').disabled = true;
+    renderChat();
+    let reply;
+    try {
+      const res = await fetch('api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system: chatSystemPrompt(), messages: chatHistory.slice(-12) }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.reply) reply = data.reply;
+      else if (res.status === 429 || res.status === 503) reply = 'Hệ thống AI đang quá tải, bạn thử lại sau ít phút nhé.';
+      else if (res.status === 404 || res.status === 405 || res.status === 501) reply = 'Chatbox chưa kết nối được máy chủ trợ lý. Bạn có thể liên hệ tư vấn viên tại [trang Liên hệ](lien-he.html).';
+      else reply = `Xin lỗi, trợ lý đang gặp sự cố (${data.error || 'lỗi ' + res.status}). Bạn thử lại sau nhé.`;
+    } catch {
+      reply = 'Không kết nối được tới trợ lý. Bạn kiểm tra mạng rồi thử lại nhé.';
+    }
+    chatHistory.push({ role: 'model', text: reply });
+    chatHistory = chatHistory.slice(-30);
+    store.set(CHAT_STORE, chatHistory);
+    chatBusy = false;
+    $('#chatSend').disabled = false;
+    renderChat();
+  }
+
+  function toggleChat(open) {
+    const panel = $('#chat');
+    open = open ?? panel.hidden;
+    panel.hidden = !open;
+    $('#chatFab').setAttribute('aria-expanded', String(open));
+    $('#chatFab').classList.toggle('is-open', open);
+    if (open) { renderChat(); $('#chatForm').elements.q.focus(); }
+  }
+
+  function renderChatbox() {
+    const chips = ['Tìm căn hộ 2 phòng ngủ ở Hà Nội', 'Thuê phòng trọ giá rẻ ở TP.HCM', 'Dự án nào đang mở bán?', 'Vay mua nhà cần chuẩn bị gì?'];
+    if (PAGE === 'detail' && all.some((x) => x.id === PARAMS.get('id'))) chips.unshift('Tóm tắt giúp tôi tin đang xem');
+    document.body.insertAdjacentHTML('beforeend', `
+      <button class="chat-fab" id="chatFab" aria-label="Mở trợ lý tư vấn" aria-expanded="false" aria-controls="chat">
+        <svg class="chat-fab__open" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg>
+        <svg class="chat-fab__close" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <section class="chat" id="chat" role="dialog" aria-label="Trợ lý My Home" hidden>
+        <header class="chat__head">
+          <span class="chat__avatar">${LOGO.split('<span class="logo__text">')[0].replace('logo__mark', 'chat__mark')}</span>
+          <div class="chat__title"><b>Trợ lý My Home</b><small>Tư vấn nhà đất bằng AI</small></div>
+          <button class="chat__icon" id="chatReset" title="Cuộc trò chuyện mới" aria-label="Cuộc trò chuyện mới">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <button class="chat__icon" id="chatClose" aria-label="Đóng trợ lý">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </header>
+        <div class="chat__body" id="chatBody" aria-live="polite"></div>
+        <div class="chat__chips" id="chatChips">${chips.map((c) => `<button type="button" class="chat__chip">${esc(c)}</button>`).join('')}</div>
+        <form class="chat__form" id="chatForm">
+          <textarea name="q" rows="1" maxlength="1000" placeholder="Nhập câu hỏi của bạn..." aria-label="Câu hỏi"></textarea>
+          <button class="chat__send" id="chatSend" type="submit" aria-label="Gửi">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+          </button>
+        </form>
+        <p class="chat__note">Câu trả lời do AI tạo, có thể chưa chính xác.</p>
+      </section>`);
+
+    const form = $('#chatForm');
+    const input = form.elements.q;
+    $('#chatFab').addEventListener('click', () => toggleChat());
+    $('#chatClose').addEventListener('click', () => { toggleChat(false); $('#chatFab').focus(); });
+    $('#chatReset').addEventListener('click', () => { if (chatBusy) return; chatHistory = []; store.set(CHAT_STORE, []); renderChat(); input.focus(); });
+    $('#chatChips').addEventListener('click', (e) => { const b = e.target.closest('.chat__chip'); if (b) sendChat(b.textContent); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); sendChat(input.value); });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); } });
+    input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 120)}px`; });
+    // Pha capture: chạy trước listener đóng modal, để Esc chỉ đóng modal nếu modal đang mở
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#chat').hidden && !$('#modal').classList.contains('is-open')) toggleChat(false); }, true);
+  }
+
   /* ================= Thành phần dùng chung ================= */
   const heartSvg = '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const pinSvg = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
@@ -936,5 +1078,6 @@
 
   /* ================= Khởi chạy ================= */
   renderLayout();
+  renderChatbox();
   ({ home: pageHome, search: pageSearch, detail: pageDetail, post: pagePost, projects: pageProjects, saved: pageSaved, contact: pageContact })[PAGE]?.();
 })();
